@@ -1,0 +1,6 @@
+@APIAlert_HostAddress = http://localhost:5062
+
+GET {{APIAlert_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
