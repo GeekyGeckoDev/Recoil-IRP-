@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="APIAlert/APIAlert.csproj" />
+  <Project Path="APIEmployee/APIEmployee.csproj" Id="1ed850c8-1a2e-449c-8c9c-91c713504833" />
   <Project Path="APIIncident/APIIncident.csproj" />
   <Project Path="APIShared/APIShared.csproj" />
   <Project Path="Application/Application.csproj" />
