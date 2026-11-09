@@ -14,5 +14,9 @@ namespace Application.IRepos
         Task RollbackAsync(CancellationToken ct = default);
 
         Task<int> SaveChangesAsync(CancellationToken ct = default);
+
+        Task ExecuteAsync(
+    Func<Task> operation,
+    CancellationToken ct = default);
     }
 }

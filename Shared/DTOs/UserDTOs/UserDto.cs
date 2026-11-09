@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Shared.DTOs.EmployeeDTOs
 {
-    public class EmployeeDto
+    public class UserDto
     {
         public Guid Id { get; set; }
 
@@ -18,7 +18,7 @@ namespace Shared.DTOs.EmployeeDTOs
         public Role Role { get; set; }
     }
 
-    public class EmployeeRegistrationDto
+    public class UserRegistrationDto
     {
         public string FirstName { get; set; }
         public string LastName { get; set; }

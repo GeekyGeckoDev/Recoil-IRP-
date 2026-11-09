@@ -1,7 +1,69 @@
 ﻿@page "/"
+@using Microsoft.AspNetCore.Components.Authorization
+@using Shared.DTOs.EmployeeDTOs
+@using UI.Authentication
+@using UI.Clients
+@inject NavigationManager Nav
+@inject AuthClient AuthClient
+@inject AuthManager AuthManager
+@inject AuthenticationStateProvider AuthStateProvider
 
-<PageTitle>Home</PageTitle>
+@rendermode InteractiveServer
 
-<h1>Hello, world!</h1>
 
-Welcome to your new app.
+<div class="login-container">
+    <div class="login-form">
+        <h2>Welcome back</h2>
+        <p>Log in to your account</p>
+
+        <EditForm Model="@loginUser" OnSubmit="LoginUserAsync">
+            <div class="form-group">
+                <label for="email">Email</label>
+                <InputText id="email"
+                           class="form-control"
+                           @bind-Value="loginUser.Email"
+                           placeholder="Enter your email" />
+            </div>
+
+            <div class="form-group">
+                <label for="password">Password</label>
+                <InputText id="password"
+                           type="password"
+                           class="form-control"
+                           @bind-Value="loginUser.Password"
+                           placeholder="Enter your password" />
+            </div>
+
+            <button type="submit" class="login-button">
+                Log in
+            </button>
+        </EditForm>
+
+        @if (!string.IsNullOrEmpty(responseMessage))
+        {
+            <p class="response-message">@responseMessage</p>
+        }
+    </div>
+</div>
+
+@code {
+
+    private LoginDto loginUser = new();
+    private string? responseMessage;
+
+    private async Task LoginUserAsync()
+    {
+        var success = await AuthManager.LoginAsync(loginUser);
+
+        if (success)
+        {
+            await AuthManager.RefreshUserFromApi();
+            responseMessage = "Login successful!";
+            Nav.NavigateTo("/weather");
+        }
+        else
+        {
+            responseMessage = "Invalid login.";
+        }
+    }
+}

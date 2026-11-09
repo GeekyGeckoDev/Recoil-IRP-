@@ -82,5 +82,26 @@ namespace Infrastructure
             if (_tx is not null)
                 await DiscardAsync(CancellationToken.None);
         }
+
+        public async Task ExecuteAsync(
+    Func<Task> operation,
+    CancellationToken ct = default)
+        {
+            await BeginAsync(ct);
+
+            try
+            {
+                await operation();
+
+                await SaveChangesAsync(ct);
+
+                await CommitAsync(ct);
+            }
+            catch
+            {
+                await RollbackAsync(CancellationToken.None);
+                throw;
+            }
+        }
     }
 }

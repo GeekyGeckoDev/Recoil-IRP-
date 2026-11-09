@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Domain.Entities
 {
     public class Incident : Entity, IAuditable
     {
+        [Key]
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
         public string Description { get; set; }
@@ -27,7 +29,7 @@ namespace Domain.Entities
 
         public ICollection<IncidentImpactChange> ImpactChanges { get; set; }
 
-        public ICollection<IncidentAssignment> Assignments { get; set; } = []; Id
+        public ICollection<IncidentAssignment> Assignments { get; set; } = [];
 
         public DateTime? DetectedAt { get; set; }
         public DateTime? ContainedAt { get; set; }

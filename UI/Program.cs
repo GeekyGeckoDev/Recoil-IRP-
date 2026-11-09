@@ -37,11 +37,11 @@ builder.Services.AddAuthorization();
 
 //Bases fpr authHandler
 
-var employeeBase = builder.Configuration["ApiSettings:EmployeeBaseUrl"];
+var userBase = builder.Configuration["ApiSettings:UserBaseUrl"];
 
 builder.Services.AddHttpClient<AuthClient>(c =>
 {
-    c.BaseAddress = new Uri(employeeBase);
+    c.BaseAddress = new Uri(userBase);
 })
     .AddHttpMessageHandler<AuthHeaderHandler>();
 

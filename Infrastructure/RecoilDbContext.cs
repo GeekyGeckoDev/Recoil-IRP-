@@ -21,7 +21,7 @@ namespace Infrastructure
         public DbSet<AlertConfig> AlertConfigs { get; set; }
 
         public DbSet<AuditLog> AuditLogs { get; set; }
-        public DbSet<Employee> Employees { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public DbSet<Evidence> Evidence { get; set; }
         public DbSet<Incident> Incidents { get; set; }

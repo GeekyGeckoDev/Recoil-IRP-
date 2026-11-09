@@ -1,4 +1,9 @@
+using Application.AuthApp;
+using Application.IRepos;
+using Application.IServices;
+using Application.Services;
 using Infrastructure;
+using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.SqlServer;
@@ -19,7 +24,46 @@ var keyBytes = Convert.FromBase64String(signingKey);
 
 // Controllers & OpenAPI
 builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddOpenApi();
+
+//Repos and services
+
+builder.Services.AddScoped<IUserCrudService, UserCrudService>();
+builder.Services.AddScoped<IUserGetService, UserGetService>();
+builder.Services.AddScoped<IUserManagerService, UserManagerService>();
+
+builder.Services.AddScoped<IEmailValidationService, EmailValidationService>();
+builder.Services.AddScoped<IPasswordValidationService, PasswordValidationService>();
+builder.Services.AddScoped<IValidationManagerService, ValidationManagerService>();
+
+builder.Services.AddScoped<IJWTService, JWTService>();
+builder.Services.AddScoped<ILogInService, LogInService>();
+builder.Services.AddScoped<IPasswordHasherService, PasswordHasherService>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+
+builder.Services.AddScoped<IUserCrudRepository, UserCrudRepository>();
+builder.Services.AddScoped<IUserGetRepository, UserGetRepository>();
+builder.Services.AddScoped<IUserValidationRepository, UserValidationRepository>();
+
+//Add Cors
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowUI", policy =>
+    {
+        policy.WithOrigins("https://localhost:7286", "http://localhost:5030")
+              .AllowAnyHeader()
+              .AllowAnyMethod()
+              .AllowCredentials();
+    });
+});
+
+
+builder.Services.AddRazorComponents()
+    .AddInteractiveServerComponents();
 
 // Authentication
 builder.Services
@@ -41,6 +85,8 @@ builder.Services
             ClockSkew = TimeSpan.FromMinutes(1)
         };
     });
+
+
 
 // Authorization
 builder.Services.AddAuthorization();

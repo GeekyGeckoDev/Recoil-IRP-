@@ -1,0 +1,64 @@
+﻿@page "/register"
+@using Shared.DTOs.EmployeeDTOs
+@using UI.API.Clients
+@inject RegisterClient RegistrationClient
+@rendermode InteractiveServer
+
+
+<h3 class="mb-4">Register Here</h3>
+
+<div class="container">
+    <div class="card shadow p-4 col-md-6 mx-auto">
+
+        <h4 class="mb-4 text-center">Join NetEquus</h4>
+
+        @if (!string.IsNullOrEmpty(responseMessage))
+        {
+            <div class="alert alert-info">
+                @responseMessage
+            </div>
+        }
+
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input class="form-control" @bind="newUser.FirstName" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+            <input class="form-control" @bind="newUser.Email" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-control" @bind="newUser.Password" />
+        </div>
+
+        <button class="btn btn-primary w-100" @onclick="RegisterUserAsync">
+            Register
+        </button>
+
+    </div>
+</div>
+
+@code {
+    private UserRegistrationDto newUser = new();
+    private string? responseMessage;
+
+    private async Task RegisterUserAsync()
+    {
+        var response = await RegistrationClient.RegisterAsync(newUser);
+
+        if (response.IsSuccessStatusCode)
+        {
+            responseMessage = "User created successfully!";
+            newUser = new UserRegistrationDto();
+        }
+        else
+        {
+            responseMessage = response.StatusCode.ToString();
+            var error = await response.Content.ReadAsStringAsync();
+            responseMessage = $"Registration failed: {error}";
+        }
+    }
+}
