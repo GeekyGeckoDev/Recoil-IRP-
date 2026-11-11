@@ -41,7 +41,6 @@ namespace APIAuthentication.Controllers
         }
 
         [HttpPost("login")]
-        [EnableRateLimiting("FixedWindow")]
         public async Task<IActionResult> Login(LoginDto dto)
         {
          

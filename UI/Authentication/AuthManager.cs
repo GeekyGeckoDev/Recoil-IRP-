@@ -20,7 +20,7 @@ namespace UI.Authentication
             _tokenStore = tokenStore;
         }
 
-        public async Task<bool> LoginAsync (LoginDto dto)
+        public async Task<bool> LoginAsync(LoginDto dto)
         {
             var response = await _authClient.LoginAsync(dto);
 
@@ -29,8 +29,19 @@ namespace UI.Authentication
 
             var json = await response.Content.ReadAsStringAsync();
 
-            var loginResult = JsonSerializer.Deserialize<LoginResponseDto>(json,
-                new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+            var loginResult = JsonSerializer.Deserialize<LoginResponseDto>(
+                json,
+                new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                });
+
+            if (loginResult is null ||
+                string.IsNullOrWhiteSpace(loginResult.AccessToken))
+            {
+                throw new InvalidOperationException(
+                    "Login response did not contain an access token.");
+            }
 
             await _tokenStore.SetAsync(loginResult.AccessToken);
 

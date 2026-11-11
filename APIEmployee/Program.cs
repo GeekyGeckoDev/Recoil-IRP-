@@ -2,6 +2,7 @@ using Application.AuthApp;
 using Application.IRepos;
 using Application.IServices;
 using Application.Services;
+using Application.UserSessionApp;
 using Infrastructure;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -32,6 +33,7 @@ builder.Services.AddOpenApi();
 builder.Services.AddScoped<IUserCrudService, UserCrudService>();
 builder.Services.AddScoped<IUserGetService, UserGetService>();
 builder.Services.AddScoped<IUserManagerService, UserManagerService>();
+builder.Services.AddScoped<IUserSessionService, UserSessionService>();
 
 builder.Services.AddScoped<IEmailValidationService, EmailValidationService>();
 builder.Services.AddScoped<IPasswordValidationService, PasswordValidationService>();

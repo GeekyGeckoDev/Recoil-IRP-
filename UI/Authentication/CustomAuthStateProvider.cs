@@ -32,3 +32,4 @@ namespace UI.Authentication
                 Task.FromResult(new AuthenticationState(user)));
         }
     }
+}

@@ -1,18 +1,21 @@
-﻿using System;
+﻿using Domain.Auditing;
+using Domain.Enums;
+using Domain.Events;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
 namespace Domain.Entities
 {
-    public class Incident : Entity, IAuditable
+    public class Incident :Entity, IAuditable
     {
         [Key]
         public Guid Id { get; set; }
         public string Title { get; set; } = string.Empty;
-        public string Description { get; set; }
+        public string Description { get; set; } = "Add a description of the incident";
 
-        public Playbook Playbook { get; set; }
+        public Playbook? Playbook { get; set; }
 
         public DateTimeOffset CreatedAt { get; set; }
         public DateTime StartDateTime { get; set; }
@@ -21,13 +24,13 @@ namespace Domain.Entities
         //Current status of the incident. This is a simple enum, not a separate entity, because the set of statuses is fixed and small.
         public IncidentStatus Status { get; set; } = IncidentStatus.Investigating;
 
-        public string Source { get; set; }
+        public string Source { get; set; } = string.Empty;
 
         public DateTime ModifiedAt { get; set; }
 
-        public ICollection<IncidentTimelineEvent> TimelineEvents { get; set; }
+        public ICollection<IncidentTimelineEvent> TimelineEvents { get; set; } = [];
 
-        public ICollection<IncidentImpactChange> ImpactChanges { get; set; }
+        public ICollection<IncidentImpactChange> ImpactChanges { get; set; } = [];
 
         public ICollection<IncidentAssignment> Assignments { get; set; } = [];
 
@@ -38,37 +41,14 @@ namespace Domain.Entities
 
         public List<string> AffectedAssets { get; set; } = [];
 
-        public ICollection<EvidenceCollection> EvidenceCollections;
+        public ICollection<EvidenceCollection> EvidenceCollections { get; set; } = [];
 
         public List<ResponseTask> Tasks { get; set; } = [];
 
 
         public Dictionary<string, string> CustomFields { get; set; } = new();
 
-        public static Incident Create(
-       string title,
-       string description,
-       string source)
-        {
-            var incident = new Incident
-            {
-                Title = title,
-                Description = description,
-                Source = source,
-                StartDateTime = DateTime.UtcNow,
-                Status = IncidentStatus.Investigating
-            };
-
-            incident.AddDomainEvent(
-                new IncidentCreatedEvent(
-                    incident.Id,
-                    incident.Title,
-                    DateTimeOffset.UtcNow
-                )
-            );
-
-            return incident;
-        }
+      
 
     }
 }

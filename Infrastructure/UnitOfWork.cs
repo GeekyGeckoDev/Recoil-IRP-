@@ -1,4 +1,6 @@
-﻿using Application.IRepos;
+﻿using Application.Common.Events;
+using Application.IRepos;
+using Domain.Events;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
@@ -7,7 +9,9 @@ using System.Text;
 namespace Infrastructure
 {
 
-    public class UnitOfWork(RecoilDbContext db) : IUnitOfWork
+    public class UnitOfWork(
+    RecoilDbContext db,
+    IDomainEventDispatcher dispatcher) : IUnitOfWork
     {
         private IDbContextTransaction? _tx;
         private int _depth;
@@ -30,23 +34,48 @@ namespace Infrastructure
 
         public async Task CommitAsync(CancellationToken ct = default)
         {
-            if (_depth == 0) throw new InvalidOperationException("No active transaction.");
+            if (_depth == 0)
+                throw new InvalidOperationException("No active transaction.");
 
-            // An inner scope reporting success does not end the transaction — the outermost one decides.
-            if (--_depth > 0) return;
+            // Nested scopes do not commit independently.
+            if (_depth > 1)
+            {
+                _depth--;
+                return;
+            }
 
-            if (_tx is null) throw new InvalidOperationException("No active transaction.");
+            if (_tx is null)
+                throw new InvalidOperationException("No active transaction.");
 
             if (_aborted)
             {
-                // Committing after an inner scope rolled back would silently persist a partial write.
                 await DiscardAsync(ct);
+
                 throw new InvalidOperationException(
                     "The transaction was rolled back by a nested operation and cannot be committed.");
             }
 
-            try { await _tx.CommitAsync(ct); }
-            finally { await DisposeTransactionAsync(); }
+            try
+            {
+                // Dispatch pending domain events.
+                await DispatchDomainEventsAsync(ct);
+
+                // Persist changes made by event handlers.
+                await db.SaveChangesAsync(ct);
+
+                // Commit the transaction.
+                await _tx.CommitAsync(ct);
+            }
+            catch
+            {
+                await DiscardAsync(CancellationToken.None);
+                throw;
+            }
+            finally
+            {
+                if (_tx is not null)
+                    await DisposeTransactionAsync();
+            }
         }
 
         public async Task RollbackAsync(CancellationToken ct = default)
@@ -101,6 +130,34 @@ namespace Infrastructure
             {
                 await RollbackAsync(CancellationToken.None);
                 throw;
+            }
+        }
+
+        //Used to find and dispatch events.
+        private async Task DispatchDomainEventsAsync(
+    CancellationToken ct)
+        {
+            while (true)
+            {
+                var entitiesWithEvents = db.ChangeTracker
+                    .Entries<Entity>()
+                    .Select(entry => entry.Entity)
+                    .Where(entity => entity.DomainEvents.Any())
+                    .ToList();
+
+                if (entitiesWithEvents.Count == 0)
+                    break;
+
+                var domainEvents = entitiesWithEvents
+                    .SelectMany(entity => entity.DomainEvents)
+                    .ToList();
+
+                await dispatcher.DispatchAsync(domainEvents, ct);
+
+                foreach (var entity in entitiesWithEvents)
+                {
+                    entity.ClearDomainEvents();
+                }
             }
         }
     }

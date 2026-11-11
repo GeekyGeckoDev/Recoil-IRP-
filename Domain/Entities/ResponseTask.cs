@@ -1,6 +1,8 @@
-﻿using System;
+﻿using Domain.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
+using TaskStatus = Domain.Enums.TaskStatus;
 
 namespace Domain.Entities
 {

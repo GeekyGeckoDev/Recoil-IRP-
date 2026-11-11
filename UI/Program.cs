@@ -5,13 +5,10 @@ using UI.Authentication;
 using UI.Clients;
 using UI.Components;
 using UI.Exstensions;
+using UI.API.Clients;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var signingKey = builder.Configuration["Jwt:SigningKey"]
-    ?? throw new InvalidOperationException("JWT Signing Key is missing.");
-
-var keyBytes = Convert.FromBase64String(signingKey);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
@@ -19,7 +16,11 @@ builder.Services.AddRazorComponents()
 
 //Authentication & Authorization
 
-builder.Services.AddAuthorizationCore();
+// Authentication & Authorization
+// Authentication & Authorization
+builder.Services.AddAuthentication();
+builder.Services.AddAuthorization();
+
 builder.Services.AddCascadingAuthenticationState();
 
 builder.Services.AddScoped<AuthService>();
@@ -29,17 +30,20 @@ builder.Services.AddScoped<CustomAuthStateProvider>();
 builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
     provider.GetRequiredService<CustomAuthStateProvider>());
 
-
 builder.Services.AddSingleton<ITokenStore, TokenStore>();
 builder.Services.AddTransient<AuthHeaderHandler>();
-
-builder.Services.AddAuthorization();
 
 //Bases fpr authHandler
 
 var userBase = builder.Configuration["ApiSettings:UserBaseUrl"];
 
 builder.Services.AddHttpClient<AuthClient>(c =>
+{
+    c.BaseAddress = new Uri(userBase);
+})
+    .AddHttpMessageHandler<AuthHeaderHandler>();
+
+builder.Services.AddHttpClient<RegisterClient>(c =>
 {
     c.BaseAddress = new Uri(userBase);
 })
@@ -64,6 +68,8 @@ app.UseAuthorization();
 app.UseAntiforgery();
 
 app.MapStaticAssets();
-app.MapRazorComponents<App>();
+
+app.MapRazorComponents<App>()
+    .AddInteractiveServerRenderMode();
 
 app.Run();

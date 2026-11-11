@@ -39,8 +39,10 @@ namespace Application.AuthApp
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString())
             };
 
-            var key = new SymmetricSecurityKey
-                (Encoding.UTF8.GetBytes(_configuration.GetValue<string>("Jwt:Key")!));
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(
+                    _configuration["Jwt:SigningKey"]
+                    ?? throw new InvalidOperationException("JWT Signing Key is missing.")));
 
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha512);
 

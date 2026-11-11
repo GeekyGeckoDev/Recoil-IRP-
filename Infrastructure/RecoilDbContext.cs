@@ -1,14 +1,15 @@
 ﻿using Domain.Entities;
-using System;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Text;
-using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace Infrastructure
 {
-    public class RecoilDbContext : IdentityDbContext<IdentityUser>
+    public class RecoilDbContext : DbContext
     {
         public RecoilDbContext(DbContextOptions<RecoilDbContext> options)
             : base(options)
@@ -38,12 +39,35 @@ namespace Infrastructure
 
         public DbSet<WebhookRequestLog> WebhookRequestLogs { get; set; }
 
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            base.OnModelCreating(modelBuilder);
+
+            modelBuilder.Entity<Evidence>()
+                .Property(e => e.Metadata)
+                .HasConversion(
+                    v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                    v => JsonSerializer.Deserialize<Dictionary<string, string>>(
+                        v, (JsonSerializerOptions?)null) ?? new Dictionary<string, string>()
+                );
+
+            modelBuilder.Entity<Incident>()
+              .Property(i => i.CustomFields)
+              .HasConversion(
+                  v => JsonSerializer.Serialize(v, (JsonSerializerOptions?)null),
+                  v => JsonSerializer.Deserialize<Dictionary<string, string>>(
+                      v, (JsonSerializerOptions?)null) ?? new Dictionary<string, string>()
+              );
+        }
 
 
-        public override int SaveChanges()
+
+        public override async Task<int> SaveChangesAsync(
+    CancellationToken cancellationToken = default)
         {
             SetAuditTimestamps();
-            return base.SaveChanges();
+
+            return await base.SaveChangesAsync(cancellationToken);
         }
 
         private void SetAuditTimestamps()
