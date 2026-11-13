@@ -14,5 +14,6 @@
   <Project Path="Monitoring.Domain/Monitoring.Domain.csproj" Id="11799223-bcff-48fb-9af7-3ef04116b041" />
   <Project Path="Monitoring.SDK/Monitoring.SDK.csproj" Id="eae919c2-4748-4c8b-aa0a-e6c5af787802" />
   <Project Path="Shared/Shared.csproj" />
+  <Project Path="TestUI/TestUI.csproj" Id="670292ab-df2b-43b5-9afe-3f6790d1cca9" />
   <Project Path="UI/UI.csproj" />
 </Solution>

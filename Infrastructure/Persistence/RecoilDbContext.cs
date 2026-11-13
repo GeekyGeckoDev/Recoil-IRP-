@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Monitoring.Domain.Entites;
+using Monitoring.SDK.Extensions;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -67,6 +68,8 @@ namespace Infrastructure.Persistence
               );
 
             modelBuilder.ApplyConfigurationsFromAssembly(typeof(RecoilDbContext).Assembly);
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(MonitoringSdkServiceCollectionExtensions).Assembly);
         }
 
 

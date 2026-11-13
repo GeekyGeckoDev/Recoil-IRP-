@@ -26,6 +26,7 @@
     <ProjectReference Include="..\Domain\Domain.csproj" />
     <ProjectReference Include="..\Monitoring.Application\Monitoring.Application.csproj" />
     <ProjectReference Include="..\Monitoring.Domain\Monitoring.Domain.csproj" />
+    <ProjectReference Include="..\Monitoring.SDK\Monitoring.SDK.csproj" />
   </ItemGroup>
 
   <ItemGroup>
