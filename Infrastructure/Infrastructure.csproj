@@ -36,4 +36,8 @@
     <None Include="C:\Users\Rebel\Desktop\Recoil\Recoil\Infrastructure\.editorconfig" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Persistence\Configuration\Monitoring\" />
+  </ItemGroup>
+
 </Project>

@@ -3,6 +3,7 @@ using Domain.Entities.Monitoring;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Monitoring.Domain.Entites;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -39,12 +40,11 @@ namespace Infrastructure.Persistence
         public DbSet<ResponseTask> ResponseTasks { get; set; }
 
         public DbSet<WebhookRequestLog> WebhookRequestLogs { get; set; }
+        public DbSet<ApplicationLog> ApplicationLogs { get; set; }
 
-        public DbSet<MonitoredAsset> MonitoredAssets { get; set; }
-        public DbSet<AgentRegistration> AgentRegistrations { get; set; }
-        public DbSet<CollectorConfiguration> CollectorConfigurations { get; set; }
+        public DbSet<ExceptionLog> ExceptionLogs { get; set; }
+        public DbSet<WatchLog> WatchLogs { get; set; }
         public DbSet<SecurityEvent> SecurityEvents { get; set; }
-        public DbSet<EventProcessingRecord> EventProcessingRecords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

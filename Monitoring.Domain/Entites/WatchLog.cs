@@ -1,0 +1,27 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+
+namespace Monitoring.Domain.Entites
+{
+    public class WatchLog
+    {
+        public Guid Id { get; set; }
+        public string ResponseBody { get; set; }
+        public int ResponseStatus { get; set; }
+        public string RequestBody { get; set; }
+        public string QueryString { get; set; }
+        public string Path { get; set; }
+        public string RequestHeaders { get; set; }
+        public string ResponseHeaders { get; set; }
+        public string Method { get; set; }
+        public string Host { get; set; }
+        public string IpAddress { get; set; }
+        public string TimeSpent { get; set; }
+
+        public HttpMethod? HttpMethod { get; set; }
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+        public DateTime Timestamp { get; set; }
+    }
+}

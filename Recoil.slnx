@@ -9,8 +9,10 @@
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Infrastructure/Infrastructure.csproj" />
   <Project Path="Monitoring.Application/Monitoring.Application.csproj" Id="aab90e93-8c6c-4154-a6e7-498505920f78" />
+  <Project Path="Monitoring.AspNetCore/Monitoring.AspNetCore.csproj" Id="58448a0e-f19d-4238-89ec-7952315e6311" />
   <Project Path="Monitoring.Contracts/Monitoring.Contracts.csproj" Id="58a636d0-4b37-4e50-a74f-3313ddc048b2" />
   <Project Path="Monitoring.Domain/Monitoring.Domain.csproj" Id="11799223-bcff-48fb-9af7-3ef04116b041" />
+  <Project Path="Monitoring.SDK/Monitoring.SDK.csproj" Id="eae919c2-4748-4c8b-aa0a-e6c5af787802" />
   <Project Path="Shared/Shared.csproj" />
   <Project Path="UI/UI.csproj" />
 </Solution>
