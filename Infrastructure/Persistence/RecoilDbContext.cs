@@ -1,4 +1,5 @@
 ﻿using Domain.Entities;
+using Domain.Entities.Monitoring;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +8,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Text.Json;
 
-namespace Infrastructure
+namespace Infrastructure.Persistence
 {
     public class RecoilDbContext : DbContext
     {
@@ -39,6 +40,12 @@ namespace Infrastructure
 
         public DbSet<WebhookRequestLog> WebhookRequestLogs { get; set; }
 
+        public DbSet<MonitoredAsset> MonitoredAssets { get; set; }
+        public DbSet<AgentRegistration> AgentRegistrations { get; set; }
+        public DbSet<CollectorConfiguration> CollectorConfigurations { get; set; }
+        public DbSet<SecurityEvent> SecurityEvents { get; set; }
+        public DbSet<EventProcessingRecord> EventProcessingRecords { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -58,6 +65,8 @@ namespace Infrastructure
                   v => JsonSerializer.Deserialize<Dictionary<string, string>>(
                       v, (JsonSerializerOptions?)null) ?? new Dictionary<string, string>()
               );
+
+            modelBuilder.ApplyConfigurationsFromAssembly(typeof(RecoilDbContext).Assembly);
         }
 
 

@@ -75,28 +75,27 @@ namespace Domain.Entities
         public Incident? Incident { get; set; }
 
         public WebhookRequestLog? SourceRequestLog { get; set; }
-        public string messageFingerprint { get; internal set; }
 
-        public Alert(
-    Guid? alertConfigId,
-    IncidentImpact impactAtFireTime,
-    string message,
-    string messageFingerprint,
-    DateTimeOffset firedAt,
-    AlertSource source)
-        {
-            Id = Guid.NewGuid();
-            AlertConfigId = alertConfigId;
-            ImpactAtFireTime = impactAtFireTime;
-            Message = message;
-            MessageFingerprint = messageFingerprint;
-            FiredAt = firedAt;
-            RegisteredAt = DateTimeOffset.UtcNow;
-            Source = source;
-            OccurrenceCount = 1;
+            public Alert(
+        Guid? alertConfigId,
+        IncidentImpact impactAtFireTime,
+        string message,
+        string messageFingerprint,
+        DateTimeOffset firedAt,
+        AlertSource source)
+            {
+                Id = Guid.NewGuid();
+                AlertConfigId = alertConfigId;
+                ImpactAtFireTime = impactAtFireTime;
+                Message = message;
+                MessageFingerprint = messageFingerprint;
+                FiredAt = firedAt;
+                RegisteredAt = DateTimeOffset.UtcNow;
+                Source = source;
+                OccurrenceCount = 1;
 
-            AddDomainEvent(new AlertCreatedEvent(this));
-        }
+                AddDomainEvent(new AlertCreatedEvent(this));
+            }
 
         public Alert() { }
     }

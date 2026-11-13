@@ -4,7 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Infrastructure
+namespace Infrastructure.Persistence
 {
     public class RecoilDbContextFactory : IDesignTimeDbContextFactory<RecoilDbContext>
     {

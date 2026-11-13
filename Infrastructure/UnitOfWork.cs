@@ -1,6 +1,7 @@
 ﻿using Application.Common.Events;
 using Application.IRepos;
 using Domain.Events;
+using Infrastructure.Persistence;
 using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;

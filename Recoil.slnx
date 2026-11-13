@@ -1,11 +1,16 @@
 <Solution>
+  <Project Path="Agent/Agent.csproj" Id="c4c9822c-ab93-43a4-86d3-663c5ddd0678" />
   <Project Path="APIAlert/APIAlert.csproj" />
   <Project Path="APIEmployee/APIUser.csproj" Id="1ed850c8-1a2e-449c-8c9c-91c713504833" />
   <Project Path="APIIncident/APIIncident.csproj" />
+  <Project Path="APIMonitoring/APIMonitoring.csproj" Id="c823c3f1-83d8-4d0c-81a9-a2529bdaabd9" />
   <Project Path="APIShared/APIShared.csproj" />
   <Project Path="Application/Application.csproj" />
   <Project Path="Domain/Domain.csproj" />
   <Project Path="Infrastructure/Infrastructure.csproj" />
+  <Project Path="Monitoring.Application/Monitoring.Application.csproj" Id="aab90e93-8c6c-4154-a6e7-498505920f78" />
+  <Project Path="Monitoring.Contracts/Monitoring.Contracts.csproj" Id="58a636d0-4b37-4e50-a74f-3313ddc048b2" />
+  <Project Path="Monitoring.Domain/Monitoring.Domain.csproj" Id="11799223-bcff-48fb-9af7-3ef04116b041" />
   <Project Path="Shared/Shared.csproj" />
   <Project Path="UI/UI.csproj" />
 </Solution>

@@ -4,6 +4,7 @@ using Application.IServices;
 using Application.Services;
 using Application.UserSessionApp;
 using Infrastructure;
+using Infrastructure.Persistence;
 using Infrastructure.Repositories;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
