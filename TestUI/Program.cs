@@ -1,10 +1,21 @@
+
 using Monitoring.AspNetCore.Extensions;
 using Monitoring.AspNetCore.Options;
-using Monitoring.SDK.Extensions;
 using TestUI.Components;
+using TestUI.Extensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Monitoring SDK
+builder.Services.AddMonitoringServices(options =>
+{
+    options.BaseAddress = "https://localhost:7228";
+    options.BatchSize = 100;
+    options.UploadInterval = TimeSpan.FromSeconds(5);
+    options.MaxRetryAttempts = 3;
+});
+
+// HTTP monitoring configuration
 builder.Services.Configure<HttpMonitoringOptions>(options =>
 {
     options.CaptureRequestBody = false;
@@ -17,40 +28,34 @@ builder.Services.Configure<HttpMonitoringOptions>(options =>
     ];
 });
 
-builder.Services.AddMonitoringSdk(options =>
-{
-    options.BaseAddress = "https://localhost:7228";
-    options.BatchSize = 100;
-    options.UploadInterval = TimeSpan.FromSeconds(5);
-    options.MaxRetryAttempts = 3;
-});
+builder.Services.AddControllers();
 
-builder.Services.Configure<HttpMonitoringOptions>(options =>
-{
-    options.CaptureRequestBody = false;
-    options.CaptureResponseBody = false;
-});
 
-// Add services to the container.
+// Razor Components
 builder.Services.AddRazorComponents();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Exception handling
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
-app.UseStatusCodePagesWithReExecute("/not-found", createScopeForStatusCodePages: true);
+
 app.UseHttpsRedirection();
+
+// Monitoring middleware
+app.UseRecoilMonitoring();
+app.MapControllers();
+
+app.UseStatusCodePagesWithReExecute(
+    "/not-found",
+    createScopeForStatusCodePages: true);
 
 app.UseAntiforgery();
 
 app.MapStaticAssets();
 app.MapRazorComponents<App>();
-
-app.UseRecoilMonitoring();
 
 app.Run();

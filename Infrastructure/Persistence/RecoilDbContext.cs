@@ -3,7 +3,9 @@ using Domain.Entities.Monitoring;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Monitoring.Contracts.Events;
 using Monitoring.Domain.Entites;
+using Monitoring.Domain.Entities.Monitoring;
 using Monitoring.SDK.Extensions;
 using System;
 using System.Collections.Generic;
@@ -46,6 +48,8 @@ namespace Infrastructure.Persistence
         public DbSet<ExceptionLog> ExceptionLogs { get; set; }
         public DbSet<WatchLog> WatchLogs { get; set; }
         public DbSet<SecurityEvent> SecurityEvents { get; set; }
+
+        public DbSet<MonitoringEventRecord> MonitoringEvents { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

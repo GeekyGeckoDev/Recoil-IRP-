@@ -3,13 +3,14 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace Monitoring.SDK.Events
+
+namespace Monitoring.SDK.Queues
 {
     public interface IMonitoringEventQueue
     {
-        bool TryEnqueue(HttpRequestMonitoringEvent monitoringEvent);
+        bool TryEnqueue(MonitoringEvent monitoringEvent);
 
-        IAsyncEnumerable<HttpRequestMonitoringEvent> ReadAllAsync(
+        IAsyncEnumerable<MonitoringEvent> ReadAllAsync(
             CancellationToken cancellationToken);
     }
 }

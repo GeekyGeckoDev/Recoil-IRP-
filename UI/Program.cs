@@ -12,7 +12,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddRazorComponents()
- .AddInteractiveServerComponents();
+    .AddInteractiveServerComponents(options =>
+    {
+        options.DetailedErrors = true;
+    });
+
+
+builder.Services.AddSignalR();
+
 
 //Authentication & Authorization
 
@@ -33,21 +40,24 @@ builder.Services.AddScoped<AuthenticationStateProvider>(provider =>
 builder.Services.AddSingleton<ITokenStore, TokenStore>();
 builder.Services.AddTransient<AuthHeaderHandler>();
 
+builder.Services.AddScoped<MonitoringHubClient>();
+
 //Bases fpr authHandler
 
 var userBase = builder.Configuration["ApiSettings:UserBaseUrl"];
 
 builder.Services.AddHttpClient<AuthClient>(c =>
 {
-    c.BaseAddress = new Uri(userBase);
+    c.BaseAddress = new Uri(userBase!);
 })
     .AddHttpMessageHandler<AuthHeaderHandler>();
 
 builder.Services.AddHttpClient<RegisterClient>(c =>
 {
-    c.BaseAddress = new Uri(userBase);
+    c.BaseAddress = new Uri(userBase!);
 })
     .AddHttpMessageHandler<AuthHeaderHandler>();
+
 
 //
 

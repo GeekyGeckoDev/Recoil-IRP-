@@ -1,0 +1,410 @@
+﻿@page "/monitoring/live"
+
+@using UI.Clients
+@using Monitoring.Contracts.Events;
+@inject MonitoringHubClient HubClient
+@implements IAsyncDisposable
+@rendermode InteractiveServer
+
+<PageTitle>Live Monitoring</PageTitle>
+
+<div class="monitoring-page">
+    <div class="monitoring-header">
+        <div>
+            <h2>Live Monitoring</h2>
+            <p>Live events received from monitored applications</p>
+        </div>
+
+        <div class="connection-status">
+            <span class="status-indicator @(_connected ? "connected" : "disconnected")"></span>
+            @(_connected ? "Connected" : "Disconnected")
+        </div>
+    </div>
+
+    @if (_connectionError is not null)
+    {
+        <div class="connection-error">
+            Could not connect to the monitoring hub: @_connectionError
+        </div>
+    }
+
+    <div class="monitoring-summary">
+        <div>
+            <span class="summary-label">Events received</span>
+            <strong>@_events.Count</strong>
+        </div>
+        <div>
+            <span class="summary-label">Connection</span>
+            <strong>@(_connected ? "Live" : "Offline")</strong>
+        </div>
+    </div>
+
+    <div class="monitoring-table-container">
+        <table class="monitoring-table">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Type</th>
+                    <th>Source</th>
+                    <th>Event</th>
+                    <th>Result</th>
+                </tr>
+            </thead>
+            <tbody>
+                @if (_events.Count == 0)
+                {
+                    <tr>
+                        <td colspan="5" class="empty-state">
+                            Waiting for monitoring events...
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var monitoringEvent in _events)
+                    {
+                        <tr @key="monitoringEvent.EventId">
+                            <td class="event-time">
+                                @(GetTimestamp(monitoringEvent)?
+                                    .ToLocalTime()
+                                    .ToString("HH:mm:ss") ?? "—")
+                            </td>
+
+                            <td>
+                                <span class="event-type">
+                                    @GetTypeLabel(monitoringEvent)
+                                </span>
+                            </td>
+
+                            <td class="event-source">
+                                @GetSource(monitoringEvent)
+                            </td>
+
+                            <td class="event-message">
+                                @GetSummary(monitoringEvent)
+                            </td>
+
+                            <td>
+                                <span class="event-result @GetResultClass(monitoringEvent)">
+                                    @GetResultLabel(monitoringEvent)
+                                </span>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<style>
+    .monitoring-page {
+        padding: 1.5rem;
+        color: var(--rz-text-color, inherit);
+    }
+
+    .monitoring-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .monitoring-header h2 {
+        margin: 0;
+    }
+
+    .monitoring-header p {
+        margin: 0.35rem 0 0;
+        opacity: 0.65;
+    }
+
+    .connection-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+    }
+
+    .status-indicator {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+    }
+
+    .connected {
+        background: #22a06b;
+    }
+
+    .disconnected {
+        background: #d64545;
+    }
+
+    .monitoring-summary {
+        display: flex;
+        gap: 2rem;
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+        background: var(--rz-base-background-color, #222);
+        border: 1px solid var(--rz-border-color, #444);
+    }
+
+    .monitoring-summary div {
+        display: flex;
+        flex-direction: column;
+        gap: 0.3rem;
+    }
+
+    .summary-label {
+        font-size: 0.8rem;
+        opacity: 0.65;
+    }
+
+    .monitoring-summary strong {
+        font-size: 1.3rem;
+    }
+
+    .monitoring-table-container {
+        overflow-x: auto;
+        border: 1px solid var(--rz-border-color, #444);
+    }
+
+    .monitoring-table {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: left;
+        font-size: 0.9rem;
+    }
+
+    .monitoring-table th {
+        padding: 0.85rem 1rem;
+        background: var(--rz-base-background-color, #222);
+        border-bottom: 1px solid var(--rz-border-color, #444);
+        white-space: nowrap;
+    }
+
+    .monitoring-table td {
+        padding: 0.85rem 1rem;
+        border-bottom: 1px solid var(--rz-border-color, #444);
+    }
+
+    .monitoring-table tbody tr:hover {
+        background: rgba(128, 128, 128, 0.08);
+    }
+
+    .event-time {
+        white-space: nowrap;
+        font-family: monospace;
+    }
+
+    .event-type,
+    .event-result {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid var(--rz-border-color, #555);
+        white-space: nowrap;
+        font-size: 0.8rem;
+    }
+
+    .event-source {
+        opacity: 0.75;
+    }
+
+    .event-message {
+        min-width: 220px;
+        max-width: 450px;
+        overflow-wrap: anywhere;
+    }
+
+    .result-success {
+        color: #22a06b;
+    }
+
+    .result-warning {
+        color: #d69e36;
+    }
+
+    .result-critical {
+        color: #d64545;
+    }
+
+    .result-neutral {
+        opacity: 0.75;
+    }
+
+    .empty-state {
+        padding: 3rem !important;
+        text-align: center;
+        opacity: 0.6;
+    }
+
+    .connection-error {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border: 1px solid #d64545;
+        color: #d64545;
+        overflow-wrap: anywhere;
+    }
+</style>
+
+@code {
+    private readonly List<MonitoringEvent> _events = new();
+
+    private const int MaxEvents = 200;
+
+    private bool _connected;
+    private string? _connectionError;
+
+    protected override async Task OnInitializedAsync()
+    {
+        Console.WriteLine(
+    $"LiveMonitoring initialized. HubClient: {HubClient.GetHashCode()}");
+        HubClient.MonitoringEventReceived += HandleMonitoringEvent;
+
+        try
+        {
+            await HubClient.StartAsync();
+            _connected = true;
+        }
+        catch (Exception ex)
+        {
+            _connectionError = ex.Message;
+            _connectionError = ex.ToString();
+            _connected = false;
+        }
+    }
+
+    private void HandleMonitoringEvent(MonitoringEvent monitoringEvent)
+    {
+        _ = InvokeAsync(() =>
+        {
+            _events.Insert(0, monitoringEvent);
+
+            if (_events.Count > MaxEvents)
+            {
+                _events.RemoveAt(_events.Count - 1);
+            }
+
+            StateHasChanged();
+        });
+    }
+
+    private static string GetTypeLabel(MonitoringEvent monitoringEvent)
+    {
+        return monitoringEvent switch
+        {
+            HttpRequestMonitoringEvent => "HTTP Request",
+            ExceptionMonitoringEvent => "Exception",
+            ApplicationLogMonitoringEvent => "Application Log",
+            _ => "Unknown"
+        };
+    }
+
+    private static DateTimeOffset? GetTimestamp(
+        MonitoringEvent monitoringEvent)
+    {
+        return monitoringEvent switch
+        {
+            HttpRequestMonitoringEvent e => e.StartTime,
+            ExceptionMonitoringEvent e => e.OccurredAt,
+            ApplicationLogMonitoringEvent e => e.OccurredAt,
+            _ => null
+        };
+    }
+
+    private static string GetSource(MonitoringEvent monitoringEvent)
+    {
+        return monitoringEvent switch
+        {
+            HttpRequestMonitoringEvent e => e.Host,
+            ExceptionMonitoringEvent e => e.Source ?? "—",
+            ApplicationLogMonitoringEvent e => e.Category ?? "—",
+            _ => "—"
+        };
+    }
+
+    private static string GetSummary(MonitoringEvent monitoringEvent)
+    {
+        return monitoringEvent switch
+        {
+            HttpRequestMonitoringEvent e =>
+                $"{e.Method} {e.Path}{e.QueryString}",
+
+            ExceptionMonitoringEvent e =>
+                $"{e.ExceptionType}: {e.Message}",
+
+            ApplicationLogMonitoringEvent e =>
+                e.Message,
+
+            _ => "Unknown monitoring event"
+        };
+    }
+
+    private static string GetResultLabel(MonitoringEvent monitoringEvent)
+    {
+        return monitoringEvent switch
+        {
+            HttpRequestMonitoringEvent e =>
+                $"{e.ResponseStatus} · {e.DurationMilliseconds} ms",
+
+            ExceptionMonitoringEvent e =>
+                e.ExceptionType,
+
+            ApplicationLogMonitoringEvent e =>
+                e.Level.ToString(),
+
+            _ => "—"
+        };
+    }
+
+    private static string GetResultClass(MonitoringEvent monitoringEvent)
+    {
+        return monitoringEvent switch
+        {
+            HttpRequestMonitoringEvent e when e.ResponseStatus >= 500 =>
+                "result-critical",
+
+            HttpRequestMonitoringEvent e when e.ResponseStatus >= 400 =>
+                "result-warning",
+
+            HttpRequestMonitoringEvent =>
+                "result-success",
+
+            ExceptionMonitoringEvent =>
+                "result-critical",
+
+            ApplicationLogMonitoringEvent e when
+                e.Level is MonitoringLogLevel.Error
+                    or MonitoringLogLevel.Critical =>
+                "result-critical",
+
+            ApplicationLogMonitoringEvent e when
+                e.Level == MonitoringLogLevel.Warning =>
+                "result-warning",
+
+            ApplicationLogMonitoringEvent =>
+                "result-neutral",
+
+            _ => "result-neutral"
+        };
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+
+        HubClient.MonitoringEventReceived -= HandleMonitoringEvent;
+
+        // await HubClient.StopAsync();
+    }
+
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        Console.WriteLine(
+            $"LiveMonitoring rendered. FirstRender: {firstRender}");
+
+        return Task.CompletedTask;
+    }
+
+  
+}

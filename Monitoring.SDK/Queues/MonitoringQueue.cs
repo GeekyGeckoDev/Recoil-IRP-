@@ -1,12 +1,12 @@
-﻿using Monitoring.Contracts.Events;
-using Monitoring.SDK.Events;
+﻿
 using System.Threading.Channels;
+using Monitoring.Contracts.Events;
 
 namespace Monitoring.SDK.Queues
 {
     public class MonitoringEventQueue : IMonitoringEventQueue
     {
-        private readonly Channel<HttpRequestMonitoringEvent> _channel;
+        private readonly Channel<MonitoringEvent> _channel;
 
         public MonitoringEventQueue(int capacity = 1000)
         {
@@ -18,16 +18,15 @@ namespace Monitoring.SDK.Queues
                 AllowSynchronousContinuations = false
             };
 
-            _channel = Channel.CreateBounded<HttpRequestMonitoringEvent>(
-                options);
+            _channel = Channel.CreateBounded<MonitoringEvent>(options);
         }
 
-        public bool TryEnqueue(HttpRequestMonitoringEvent monitoringEvent)
+        public bool TryEnqueue(MonitoringEvent monitoringEvent)
         {
             return _channel.Writer.TryWrite(monitoringEvent);
         }
 
-        public IAsyncEnumerable<HttpRequestMonitoringEvent> ReadAllAsync(
+        public IAsyncEnumerable<MonitoringEvent> ReadAllAsync(
             CancellationToken cancellationToken)
         {
             return _channel.Reader.ReadAllAsync(cancellationToken);

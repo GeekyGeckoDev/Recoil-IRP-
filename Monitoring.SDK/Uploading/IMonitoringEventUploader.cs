@@ -1,14 +1,12 @@
-﻿using Monitoring.Contracts.Events;
-using System;
-using System.Collections.Generic;
-using System.Text;
+﻿
+using Monitoring.Contracts.Events;
 
 namespace Monitoring.SDK.Uploading
 {
     public interface IMonitoringEventUploader
     {
         Task UploadBatchAsync(
-            IReadOnlyCollection<HttpRequestMonitoringEvent> events,
+            IReadOnlyCollection<MonitoringEvent> events,
             CancellationToken cancellationToken);
     }
 }

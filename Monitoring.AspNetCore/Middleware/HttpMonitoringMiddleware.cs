@@ -9,7 +9,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Diagnostics;
 using Monitoring.Contracts.Events;
-using Monitoring.SDK.Events;
+using Monitoring.SDK.Queues;
 
 namespace Monitoring.AspNetCore.Middleware
 {
@@ -21,11 +21,13 @@ namespace Monitoring.AspNetCore.Middleware
         private readonly HttpMonitoringOptions _options;
 
         public HttpMonitoringMiddleware(
-            RequestDelegate next,
-            IOptions<HttpMonitoringOptions> options)
+    RequestDelegate next,
+    IOptions<HttpMonitoringOptions> options,
+    IMonitoringEventQueue eventQueue)
         {
             _next = next;
             _options = options.Value;
+            _eventQueue = eventQueue;
         }
 
         private static HttpRequestMonitoringEvent CreateMonitoringEvent(
@@ -77,7 +79,10 @@ namespace Monitoring.AspNetCore.Middleware
                 responseLog,
                 stopwatch.ElapsedMilliseconds);
 
-            // Next step: submit monitoringEvent to the local SDK event queue.
+            var queued = _eventQueue.TryEnqueue(monitoringEvent);
+
+            Console.WriteLine(
+                $"Monitoring event queued: {queued} | {monitoringEvent.EventId}");
         }
 
         private bool ShouldExclude(HttpContext context)

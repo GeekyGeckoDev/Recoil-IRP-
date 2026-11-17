@@ -14,6 +14,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Application\Application.csproj" />
+    <ProjectReference Include="..\Monitoring.Contracts\Monitoring.Contracts.csproj" />
     <ProjectReference Include="..\Monitoring.Domain\Monitoring.Domain.csproj" />
   </ItemGroup>
 

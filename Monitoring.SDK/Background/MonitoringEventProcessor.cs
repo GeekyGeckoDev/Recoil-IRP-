@@ -2,7 +2,6 @@
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Monitoring.Contracts.Events;
-using Monitoring.SDK.Events;
 using Monitoring.SDK.Options;
 using Monitoring.SDK.Queues;
 using Monitoring.SDK.Uploading;
@@ -36,7 +35,7 @@ namespace Monitoring.SDK.Background
             protected override async Task ExecuteAsync(
                 CancellationToken stoppingToken)
             {
-                var batch = new List<HttpRequestMonitoringEvent>();
+                var batch = new List<MonitoringEvent>();
 
                 await using var enumerator = _eventQueue
                     .ReadAllAsync(stoppingToken)
@@ -111,7 +110,7 @@ namespace Monitoring.SDK.Background
 
 
             private async Task ProcessBatchAsync(
-                List<HttpRequestMonitoringEvent> batch,
+                List<MonitoringEvent> batch,
                 CancellationToken cancellationToken)
             {
                 var uploaded = await UploadWithRetryAsync(
@@ -129,7 +128,7 @@ namespace Monitoring.SDK.Background
 
 
             private async Task<bool> UploadWithRetryAsync(
-                List<HttpRequestMonitoringEvent> batch,
+                List<MonitoringEvent> batch,
                 CancellationToken cancellationToken)
             {
                 for (int attempt = 1;

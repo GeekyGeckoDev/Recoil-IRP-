@@ -16,19 +16,46 @@ namespace Monitoring.SDK.Uploading
             _httpClient = httpClient;
         }
 
+
         public async Task UploadBatchAsync(
-            IReadOnlyCollection<HttpRequestMonitoringEvent> events,
+            IReadOnlyCollection<MonitoringEvent> events,
             CancellationToken cancellationToken)
         {
             if (events.Count == 0)
                 return;
 
-            var response = await _httpClient.PostAsJsonAsync(
-                Endpoint,
-                events,
-                cancellationToken);
+            var requestUri = new Uri(_httpClient.BaseAddress!, Endpoint);
 
-            response.EnsureSuccessStatusCode();
+            Console.WriteLine("=== MONITORING SDK UPLOAD ===");
+            Console.WriteLine($"Destination: {requestUri}");
+            Console.WriteLine($"Event count: {events.Count}");
+
+            foreach (var monitoringEvent in events)
+            {
+                Console.WriteLine(
+                    $"Uploading: {monitoringEvent.GetType().Name} " +
+                    $"| ID: {monitoringEvent.EventId}");
+            }
+
+            try
+            {
+                var response = await _httpClient.PostAsJsonAsync(
+                    Endpoint,
+                    events,
+                    cancellationToken);
+
+                Console.WriteLine(
+                    $"Upload response: {(int)response.StatusCode} " +
+                    $"{response.StatusCode}");
+
+                response.EnsureSuccessStatusCode();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"UPLOAD FAILED: {ex}");
+                throw;
+            }
         }
+
     }
 }

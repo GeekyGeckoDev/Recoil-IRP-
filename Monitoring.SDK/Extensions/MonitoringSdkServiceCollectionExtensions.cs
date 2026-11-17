@@ -2,7 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Monitoring.SDK.Background;
 using Monitoring.SDK.Background.Monitoring.SDK.Background;
-using Monitoring.SDK.Events;
+using Monitoring.SDK.Clients;
 using Monitoring.SDK.Options;
 using Monitoring.SDK.Queues;
 using Monitoring.SDK.Uploading;
@@ -21,6 +21,8 @@ namespace Monitoring.SDK.Extensions
             {
                 services.Configure(configureOptions);
             }
+
+            services.AddScoped<IMonitoringClient, MonitoringClient>();
 
             services.AddSingleton<
                 IMonitoringEventQueue,

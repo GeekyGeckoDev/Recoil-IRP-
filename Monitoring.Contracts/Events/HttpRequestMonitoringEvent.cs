@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Monitoring.Contracts.Events
 {
-    public class HttpRequestMonitoringEvent
+    public class HttpRequestMonitoringEvent : MonitoringEvent
     {
         public string Method { get; set; } = string.Empty;
         public string Path { get; set; } = string.Empty;
